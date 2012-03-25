@@ -5,7 +5,10 @@ public class NoteBean {
 	protected String title;
 	protected String body;
 	
-	public NoteBean(){}
+	public NoteBean(){
+		title = "";
+		body = "";
+	}
 
 	public String getTitle() {
 		return title;

@@ -17,7 +17,7 @@ import com.esotericsoftware.yamlbeans.YamlWriter;
 /**
  * Servlet implementation class Sample
  */
-@WebServlet(name="Note",urlPatterns = {"/new","/edit","/show", "/"})
+@WebServlet(name = "Note", urlPatterns = { "/new", "/edit", "/show", "/" })
 public class NoteServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	protected static final String NOTE_FILE = "/Users/shintaro/Desktop/note.yml";
@@ -36,32 +36,34 @@ public class NoteServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		log("doGet()");
 		String userPath = request.getServletPath();
+		log("method: doGet(), path: \""+userPath +"\"");
 		RequestDispatcher rDispatcher = null;
-		System.out.println(userPath);
-		if ("/show".equals(userPath) || "/".equals(userPath)) {
-			try {
+		try {
+			if ("/show".equals(userPath) || "/".equals(userPath)) {
+
 				YamlReader reader = new YamlReader(new FileReader(NOTE_FILE));
 				NoteBean note = reader.read(NoteBean.class);
 				request.setAttribute("noteBean", note);
-				rDispatcher = request
-						.getRequestDispatcher("/show.jsp");
-			} catch (java.io.FileNotFoundException e) {
-				rDispatcher = request
-						.getRequestDispatcher("/new.jsp");
+				rDispatcher = request.getRequestDispatcher("/show.jsp");
+
+			} else if ("/edit".equals(userPath)) {
+				YamlReader reader = new YamlReader(new FileReader(NOTE_FILE));
+				NoteBean note = reader.read(NoteBean.class);
+				request.setAttribute("noteBean", note);
+				rDispatcher = request.getRequestDispatcher("/edit.jsp");
+			} else if ("/new".equals(userPath)) {
+				NoteBean note = new NoteBean();
+				request.setAttribute("noteBean", note);
+				rDispatcher = request.getRequestDispatcher("/new.jsp");
 			}
-		}else if("/edit".equals(userPath)){
-			YamlReader reader = new YamlReader(new FileReader(NOTE_FILE));
-			NoteBean note = reader.read(NoteBean.class);
-			request.setAttribute("noteBean", note);
-			rDispatcher = request
-					.getRequestDispatcher("/edit.jsp");
-		}else if("/new".equals(userPath)){
-			rDispatcher = request
-					.getRequestDispatcher("/new.jsp");			
+		} catch (java.io.FileNotFoundException e) {
+			response.sendRedirect("/Note/new");
+			return;
 		}
 		rDispatcher.forward(request, response);
-		
+
 	}
 
 	/**
@@ -71,6 +73,7 @@ public class NoteServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		log("method: doGet(), path: \""+request.getServletPath()+"\"");
 		NoteBean note = new NoteBean();
 		note.setTitle(request.getParameter("title"));
 		note.setBody(request.getParameter("body"));
